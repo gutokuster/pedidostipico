@@ -1,0 +1,47 @@
+{% extends 'core/base.html' %}
+
+{% block conteudo %}
+<main role="main" class="container">
+      <h1 class="mt-5">Típico General Küster</h1>
+      <p class="lead">Selecione uma opção: </p>
+      <div class="row">
+        <div class="col-md-4">
+          <div class="card mb-4 box-shadow">
+            <a href="{% url 'buffet' %}">
+              <div class="card-body">
+                <p class="card-text">Buffet</p>
+              </div>
+            </a>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="card mb-4 box-shadow">
+            <a href="{% url 'cozinha_quente' %}">
+              <div class="card-body">
+                <p class="card-text">Cozinha Quente</p>
+              </div>
+            </a>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="card mb-4 box-shadow">
+            <a href="{% url 'cozinha_fria' %}">
+              <div class="card-body">
+                <p class="card-text">Cozinha Fria</p>
+              </div>
+            </a>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="card mb-4 box-shadow">
+            <a href="{% url 'login' %}">
+              <div class="card-body">
+                <p class="card-text">Login</p>
+              </div>
+            </a>
+          </div>
+        </div>
+      </div>
+    </main>
+
+{% endblock %}
