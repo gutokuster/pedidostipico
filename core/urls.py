@@ -5,7 +5,8 @@ app_name = 'core'
 
 urlpatterns = [
     path('', views.index, name='index'),
-    path('login/', views.login, name='login'),
+    path('logar/', views.logar, name='logar'),
+
     # Buffet
     path('buffet/', views.buffet, name='buffet'),
     path('buffet/pedido/', views.criar_pedido, name='criar_pedido'),

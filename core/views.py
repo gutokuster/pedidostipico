@@ -3,6 +3,9 @@ import datetime
 from django.shortcuts import render, redirect, get_object_or_404
 from .models import Item, PedidoAtrasado, Pedido
 from django.db.models import Q
+from django.contrib.auth import authenticate, login
+from django.contrib.auth.forms import AuthenticationForm
+
 
 
 def atualiza_situacao_pedido(pk, hora_atual):
@@ -21,8 +24,20 @@ def index(request):
     return render(request, 'core/index.html', contexto)
 
 
-def login(request):
-    return render(request, 'core/login.html')
+def logar(request):
+    if request.method == 'POST':
+        print(request.POST)
+        username = request.POST['username']
+        password = request.POST['password']
+        usuario = authenticate(request, username=username, password=password)
+        if usuario is not None:
+            login(request, usuario)
+            return redirect('gerencia:dashboard')
+        else:
+            form_login = AuthenticationForm()
+    else:
+        form_login = AuthenticationForm()
+    return render(request, 'core/login.html', {'form_login': form_login})
 
 '''
 Funções Buffet

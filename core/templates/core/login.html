@@ -15,14 +15,20 @@
   </head>
 
   <body class="text-center">
-    <form action="{% url 'gerencia:dashboard' %}" class="form-signin" method="POST">
+    <form action="{% url 'core:logar' %}" class="form-signin" method="POST">
       {% csrf_token %}
       <img class="mb-4" src="{% static 'images/logo' %}" alt="" width="220" height="220">
       <h1 class="h3 mb-3 font-weight-normal">Informe as Credenciais</h1>
-      <label for="inputEmail" class="sr-only">Usuário</label>
-      <input type="email" id="inputEmail" class="form-control" placeholder="Email" required autofocus>
-      <label for="inputPassword" class="sr-only">Senha</label>
-      <input type="password" id="inputPassword" class="form-control" placeholder="Senha" required>
+      <div class="form-group">
+        {{form_login.username.errors}}
+        Usuário: {{form_login.username}}
+      </div>
+      <div class="form">
+        {{form_login.password.errors}}
+        Senha: {{form_login.password}}
+      </div>
+
+
       <button class="btn btn-lg btn-primary btn-block" type="submit">Entrar</button>
       <p class="mt-5 mb-3 text-muted">&copy; 2017-2018</p>
     </form>
