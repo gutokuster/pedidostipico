@@ -1,0 +1,104 @@
+{% extends 'core/base.html' %}
+{% block conteudo %}
+<header>
+      <!-- Fixed navbar -->
+      <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
+        <div class="collapse navbar-collapse" id="navbarCollapse">
+          <ul class="navbar-nav mr-auto">
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'core:buffet' %}">Home <span class="sr-only">(current)</span></a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#">Cardápio</a>
+            </li>
+          </ul>
+        </div>
+      </nav>
+    </header>
+    <!-- Begin page content -->
+
+<ul class="nav nav-tabs">
+  <li class="nav-item">
+    <a class="nav-link active" href="#">Active</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" href="#">Link</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" href="#">Link</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true">Disabled</a>
+  </li>
+</ul>
+
+    <main role="main" class="container-fluid">
+        <br>
+      <h1 class="mt-5">Típico General Küster</h1>
+      <p class="lead">Pedidos em Aberto</p>
+      <div class="row">
+            {% for pedido in pedidos %}
+        <div class="col-md-2">
+          <div class="card mb-4 box-shadow">
+              <div class="card-body">
+                  {% for item in itens %}
+                    {% if item.id == pedido.item_id %}
+                        <form action="{% url 'core:baixar_pedido' pedido.id %}" method="POST">
+                            {% csrf_token %}
+                            {% if pedido.situacao == 'Atrasado' %}
+                                <button type="submit" class="btn btn-block btn-danger">{{ pedido.quantidade }}x {{ item.nome }}</input>
+                            {% elif pedido.situacao == 'Em Preparo' %}
+                                <button type="submit" class="btn btn-block btn-info">{{ pedido.quantidade }}x {{ item.nome }}</button>
+                            {% elif pedido.situacao == 'Entregue' %}
+                                <button type="submit" class="btn btn-block btn-success">{{ pedido.quantidade }}x {{ item.nome }}</button>
+                            {% endif %}
+                        </form>
+              </div>
+              <div class="card-footer">
+                  <center>
+                      Previsão: {{ pedido.limite_entrega }} ({{ item.tempo_preparo }})
+                        <button type="submit" class="btn btn-sm btn-danger" onclick="cancelar_pedido({{ pedido.id }})">Cancelar</button>
+                  </center>
+              </div>
+                   {% endif %}
+                  {% endfor %}
+          </div>
+        </div>
+            {% endfor %}
+      </div>
+      <p class="lead">Itens disponíveis</p>
+      <div class="row">
+              {% for item in itens %}
+        <div class="col-md-1">
+          <div class="card mb-4 box-shadow">
+                  <div class="card-body">
+                      <center>
+                          <button type="submit" class="btn btn-block btn-infoo" onclick="quantidade_item({{ item.id }})">{{ item.nome }}</button>
+                      </center>
+                  </div>
+          </div>
+        </div>
+              {% endfor %}
+
+      </div>
+    </main>
+    <script>
+        function quantidade_item(pk_item) {
+            var quantidade=prompt("Quantidade:");
+            if (quantidade!=null) {
+                url = "{% url 'core:criar_pedido' %}";
+                window.location = url + "?pk=" + pk_item + "&quantidade=" + quantidade;
+            }
+        }
+        </script>
+    <script>
+        function cancelar_pedido(pk_pedido) {
+            var resp=confirm("O pedido será cancelado!\n Deseja continuar?");
+            if (resp == true) {
+               var url = "{% url 'core:cancelar_pedido' %}";
+               window.location = url + "?pk=" + pk_pedido;
+            }
+        }
+    </script>
+
+{% endblock %}

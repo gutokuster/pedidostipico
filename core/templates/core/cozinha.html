@@ -1,0 +1,45 @@
+{% extends 'core/base.html' %}
+{% block conteudo %}
+    <!-- Begin page content -->
+    <main role="main" class="container-fluid">
+      <h3 class="mt-5">Pedido Cozinha {{ flag }}</h3>
+<table class="table table-hover">
+  <thead>
+    <tr>
+      <th scope="col">Item</th>
+      <th scope="col">Quantidade</th>
+      <th scope="col">Hora Pedido</th>
+      <th scope="col">Tempo Restante</th>
+      <th scope="col">Status</th>
+      <th scope="col">Ação</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for pedido in pedidos %}
+      {% for item in itens %}
+        {% if pedido.item_id == item.id %}
+    {% if pedido.situacao == 'Atrasado' %}
+      <tr class="table-danger">
+        {% else %}
+        <tr>
+      {% endif %}
+      <th scope="row">{{ item.nome }}</th>
+      <td>{{ pedido.quantidade }}</td>
+      <td>{{ pedido.hora_pedido }}</td>
+      <td>{{ tempo_restante }}</td>
+      <td>{{ pedido.situacao }}</td>
+      <td>
+        <form action="{% url 'core:liberar_pedido' pedido.id %}" method="POST">
+          {% csrf_token %}
+          <button type="submit" class="btn btn-secondary" >Liberar</button>
+        </form>
+      </td>
+        {% endif %}
+      {% endfor %}
+      {% endfor %}
+    </tr>
+  </tbody>
+</table>
+    </main>
+
+{% endblock %}
