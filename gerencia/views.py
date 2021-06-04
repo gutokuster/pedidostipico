@@ -2,14 +2,17 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth import logout
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
-from .forms import ItemForm
-from core.models import Item
+from core.forms import ItemForm
+from core.models import Item, PedidoAtrasado, Pedido
 
 @login_required
 def dashboard(request):
     contexto = {
         'titulo_pagina': 'Gestão de Pedidos',
         'usuario': User,
+        'total_pedidos': Pedido.objects.all().count(),
+        'total_pedidos_cancelados': Pedido.objects.filter(situacao='Cancelado').count(),
+        'total_pedidos_atrasados': PedidoAtrasado.objects.all().count(),
     }
     return render(request, 'gerencia/dashboard.html', contexto)
 
@@ -24,13 +27,13 @@ def cadastrar_item(request):
     if str(request.method) == 'POST':
         if form.is_valid():
             form.save()
-            return render(request, 'gerencia:listar_itens')
+            return redirect('gerencia:listar_itens')
     contexto = {
         'titulo_pagina': 'Cadastro de Itens',
         'titulo': 'Inclusão de novo item',
         'form': form,
     }
-    return redirect('gerencia:listar_itens')
+    return render(request, 'gerencia/cadastro_item.html', contexto)
 
 @login_required
 def listar_itens(request):

@@ -10,7 +10,7 @@ from django.contrib.auth.forms import AuthenticationForm
 
 def atualiza_situacao_pedido(pk, hora_atual):
     pedido = get_object_or_404(Pedido, pk=pk)
-    if pedido.limite_entrega < hora_atual and pedido.situacao != 'Atrasado':
+    if pedido.limite_entrega < hora_atual and pedido.situacao == 'Em Preparo':
         pedido.situacao = 'Atrasado'
         pedido_atrasado = PedidoAtrasado()
         pedido_atrasado.pedido_id = pedido.pk
@@ -53,7 +53,8 @@ def buffet(request):
     contexto = {
         'hora_atual': hora_atual,
         'titulo_pagina': 'Pedidos Buffet',
-        'itens': Item.objects.all(),
+        'itens': Item.objects.filter(ativo=True),
+        #'itens': Item.objects.all(),
         'pedidos': pedidos,
     }
     return render(request, 'core/buffet.html', contexto)
@@ -74,8 +75,9 @@ def criar_pedido(request):
 
 def baixar_pedido(request, pk):
     pedido = get_object_or_404(Pedido, pk=pk)
-    pedido.situacao = 'Baixado'
-    pedido.save()
+    if pedido.situacao == 'Entregue':
+        pedido.situacao = 'Baixado'
+        pedido.save()
     return redirect('core:buffet')
 
 def cancelar_pedido(request):
