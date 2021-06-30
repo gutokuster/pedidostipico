@@ -65,9 +65,9 @@
                             </center>
                         </div>
                         <div class="card-footer">
-                            <center>
                                 Previsão: {{ pedido.limite_entrega }}
-                            </center>
+                            &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
+                                <button type="submit" class="btn btn-danger" onclick="cancelar_pedido({{ pedido.id }})">Cancelar</button>
                         </div>
                     {% endif %}
                 {% endfor %}

@@ -93,7 +93,7 @@ def baixar_pedido(request, pk):
     return redirect('core:buffet')
 
 
-def cancelar_pedido(request):
+def cancelar_pedido(request, pk):
     pk = request.GET['pk']
     pedido = get_object_or_404(Pedido, pk=pk)
     pedido.situacao = 'Cancelado'
