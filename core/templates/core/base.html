@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta name="description" content="Sistema de Pedido - Restaurante Típico General Küster">
     <meta name="author" content="gkuster - gutokuster@gmail.com">
+    <meta http-equiv="refresh" content="{{ configuracao.taxa_atualizacao }}">
     <!-- Bootstrap core CSS -->
     <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
     <!-- Custom styles for this template -->
@@ -18,7 +19,7 @@
 
     <footer class="footer">
       <div class="container-fluid">
-        <span class="text-muted">&copy 2021 - Resturante Típico General Küster</span>
+        <span class="text-muted">&copy 2021 - Resturante Típico General Küster - <b>{% now 'H:i' %}</b></span>
       </div>
     </footer>
   </body>

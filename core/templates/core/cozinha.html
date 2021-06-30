@@ -2,7 +2,7 @@
 {% block conteudo %}
     <!-- Begin page content -->
     <main role="main" class="container-fluid">
-      <h3 class="mt-5">Pedido Cozinha {{ flag }}</h3>
+      <h3 class="mt-5">{{ titulo_pagina }}</h3>
 <table class="table table-hover">
   <thead>
     <tr>
@@ -25,8 +25,8 @@
       {% endif %}
       <th scope="row">{{ item.nome }}</th>
       <td>{{ pedido.quantidade }}</td>
-      <td>{{ pedido.hora_pedido }}</td>
-      <td>{{ tempo_restante }}</td>
+      <td>{{ pedido.hora_pedido|date:'H:i' }}</td>
+      <td>{{ pedido.tempo_restante }}</td>
       <td>{{ pedido.situacao }}</td>
       <td>
         <form action="{% url 'core:liberar_pedido' pedido.id %}" method="POST">

@@ -1,18 +1,9 @@
 from django import forms
-from core.models import Item
+from .models import Configuracoes
 
-class ItemForm(forms.ModelForm):
-    DESTINO_CHOICES = (
-        ('Cozinha Fria', 'Cozinha Fria'),
-        ('Cozinha Quente', 'Cozinha Quente'),
-        ('Sobremesas', 'Sobremesas'),
-    )
-    nome = forms.CharField(label='Nome', max_length=100)
-    tempo_preparo = forms.TimeField(label='Tempo de Preparo')
-    ativo = forms.BooleanField(label='Ativo?', required=False)
-    diario = forms.BooleanField(label='Cardápio Diário', required=False)
-    destino = forms.ChoiceField(label='Cozinha Destino', choices=DESTINO_CHOICES)
+class ConfiguracoesForm(forms.ModelForm):
+    taxa_atualizacao = forms.IntegerField(label='Atualização Automática (seg)')
 
     class Meta:
-        model = Item
+        model = Configuracoes
         fields = '__all__'

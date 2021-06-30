@@ -2,20 +2,34 @@ import datetime
 
 from django.shortcuts import render, redirect, get_object_or_404
 from .models import Item, PedidoAtrasado, Pedido
+from gerencia.models import Configuracoes
 from django.db.models import Q
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.forms import AuthenticationForm
 
 
-
 def atualiza_situacao_pedido(pk, hora_atual):
     pedido = get_object_or_404(Pedido, pk=pk)
-    if pedido.limite_entrega < hora_atual and pedido.situacao == 'Em Preparo':
+    if str(pedido.tempo_restante) == '00:00:00' and pedido.situacao == 'Em Preparo':
         pedido.situacao = 'Atrasado'
         pedido_atrasado = PedidoAtrasado()
         pedido_atrasado.pedido_id = pedido.pk
         pedido.save()
         pedido_atrasado.save()
+
+
+def atualiza_tempo_restante(pk, hora_atual):
+    pedido = get_object_or_404(Pedido, pk=pk)
+    if datetime.datetime.now().time() > pedido.limite_entrega:
+        pedido.tempo_restante = datetime.time(0, 0, 0)
+        pedido.situacao = 'Atrasado'
+    else:
+        hora = pedido.limite_entrega.hour - hora_atual.hour
+        minuto = pedido.limite_entrega.minute - hora_atual.minute
+        pedido.tempo_restante = datetime.time(hora, minuto, 0)
+
+    pedido.save()
+
 
 def index(request):
     contexto = {
@@ -39,23 +53,22 @@ def logar(request):
         form_login = AuthenticationForm()
     return render(request, 'core/login.html', {'form_login': form_login})
 
+
 '''
 Funções Buffet
 '''
 def buffet(request):
     pedidos = Pedido.objects.filter(Q(situacao='Em Preparo') | Q(situacao='Atrasado') | Q(situacao='Entregue'))
     hora_atual = datetime.datetime.now().time()
-    print(type(hora_atual))
-    if pedidos.count() > 0:
-        for pedido in pedidos:
-            atualiza_situacao_pedido(pedido.id, hora_atual)
-
+    lista_pedidos = []
+    for pedido in pedidos:
+        lista_pedidos.append(pedido.item_id)
     contexto = {
-        'hora_atual': hora_atual,
         'titulo_pagina': 'Pedidos Buffet',
-        'itens': Item.objects.filter(ativo=True),
-        #'itens': Item.objects.all(),
+        'itens': Item.objects.filter(ativo=True).order_by('nome'),
         'pedidos': pedidos,
+        'lista_pedidos': lista_pedidos,
+        'configuracao': get_object_or_404(Configuracoes, pk=1),
     }
     return render(request, 'core/buffet.html', contexto)
 
@@ -65,13 +78,12 @@ def criar_pedido(request):
     quantidade = request.GET['quantidade']
     item = get_object_or_404(Item, pk=pk)
     pedido = Pedido(item=item, quantidade=quantidade)
-    tempoPreparo = str(item.tempo_preparo)
-    horas = tempoPreparo[0:2]
-    minutos = tempoPreparo[3:5]
+    minutos = str(item.tempo_preparo)
     pedido.limite_entrega = datetime.datetime.now() + datetime.timedelta(minutes=int(minutos))
-    print('Limite: ', pedido.limite_entrega)
+    pedido.hora_entrega = pedido.limite_entrega
     pedido.save()
     return redirect('core:buffet')
+
 
 def baixar_pedido(request, pk):
     pedido = get_object_or_404(Pedido, pk=pk)
@@ -80,6 +92,7 @@ def baixar_pedido(request, pk):
         pedido.save()
     return redirect('core:buffet')
 
+
 def cancelar_pedido(request):
     pk = request.GET['pk']
     pedido = get_object_or_404(Pedido, pk=pk)
@@ -87,20 +100,22 @@ def cancelar_pedido(request):
     pedido.save()
     return redirect('core:buffet')
 
+
 '''
 Funções Cozinha
 '''
-
 def cozinha_quente(request):
     pedidos = Pedido.objects.filter(Q(situacao='Em Preparo') | Q(situacao='Atrasado'))
     hora_atual = datetime.datetime.now().time()
     itens = Item.objects.filter(destino='Cozinha Quente')
+    if pedidos.count() > 0:
+        for pedido in pedidos:
+            atualiza_tempo_restante(pedido.id, hora_atual)
     contexto = {
-        'titulo_pagina': 'Pedido Cozinha Quente',
+        'titulo_pagina': 'Pedidos Cozinha Quente',
         'pedidos': pedidos,
         'itens': itens,
-        'hora_atual': hora_atual,
-    #    'tempo_restante': tempo_restante,
+        'configuracao': get_object_or_404(Configuracoes, pk=1),
     }
     return render(request, 'core/cozinha.html', contexto)
 
@@ -109,13 +124,19 @@ def cozinha_fria(request):
     pedidos = Pedido.objects.filter(Q(situacao='Em Preparo') | Q(situacao='Atrasado'))
     itens = Item.objects.filter(Q(destino='Cozinha Fria') | Q(destino='Sobremesas'))
     hora_atual = datetime.datetime.now().time()
+    #tempo_restante = hora_atual - pedido.limite_entrega
+    if pedidos.count() > 0:
+        for pedido in pedidos:
+            atualiza_tempo_restante(pedido.id, hora_atual)
+
     contexto = {
-        'titulo_pagina': 'Pedido Cozinha Fria',
+        'titulo_pagina': 'Pedidos Cozinha Fria',
         'pedidos': pedidos,
         'itens': itens,
-        'hora_atual': hora_atual,
+        'configuracao': get_object_or_404(Configuracoes, pk=1),
     }
     return render(request, 'core/cozinha.html', contexto)
+
 
 def liberar_pedido(request, pk):
     pedido = get_object_or_404(Pedido, pk=pk)
@@ -133,11 +154,13 @@ def liberar_pedido(request, pk):
     else:
         return redirect('core:cozinha_fria')
 
-
 '''
-TODO: Incluir 'tempo restante' na cozinha
+DONE: Incluir 'tempo restante' na cozinha
 DONE: Alterar cor da linha dos itens atrasado na cozinha
-TODO: AJAX para atualizar as telas (15 seg)
+DONE: JS para atualizar as telas (via gerencia/configuração)
 DONE: Cancelar pedido
-TODO: Cardápio com itens fixos + variaveis
+CANC: Cardápio com itens fixos + variaveis
+
+TODO: Permitir incluir novos pedidos com itens em aberto - Usar JS, perguntar se deseja baixar o pedido ou incluir um novo
+TODO: Relatórios gerenciais
 '''

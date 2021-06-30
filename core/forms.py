@@ -24,7 +24,7 @@ class ItemForm(forms.ModelForm):
         ('Sobremesas', 'Sobremesas'),
     )
     nome = forms.CharField(label='Nome', max_length=100)
-    tempo_preparo = forms.TimeField(label='Tempo de Preparo')
+    tempo_preparo = forms.IntegerField(label='Tempo de Preparo')
     ativo = forms.BooleanField(label='Ativo?', required=False)
     diario = forms.BooleanField(label='Cardápio Diário', required=False)
     destino = forms.ChoiceField(label='Cozinha Destino', choices=DESTINO_CHOICES)

@@ -3,17 +3,26 @@ from django.contrib.auth import logout
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from core.forms import ItemForm
+from .forms import ConfiguracoesForm
 from core.models import Item, PedidoAtrasado, Pedido
+from .models import Configuracoes
 
 @login_required
 def dashboard(request):
+    itens = Item.objects.all()
+    pedidos_atrasados = PedidoAtrasado.objects.all()
+    pedidos = Pedido.objects.all()
     contexto = {
         'titulo_pagina': 'Gestão de Pedidos',
         'usuario': User,
-        'total_pedidos': Pedido.objects.all().count(),
-        'total_pedidos_cancelados': Pedido.objects.filter(situacao='Cancelado').count(),
-        'total_pedidos_atrasados': PedidoAtrasado.objects.all().count(),
+        'itens': itens,
+        'pedidos': pedidos,
+        'total_pedidos': pedidos.count(),
+        'total_pedidos_cancelados': pedidos.filter(situacao='Cancelado').count(),
+        'pedidos_atrasados': pedidos_atrasados,
+        'total_pedidos_atrasados': pedidos_atrasados.count(),
     }
+    print(PedidoAtrasado.objects.all().count())
     return render(request, 'gerencia/dashboard.html', contexto)
 
 @login_required
@@ -27,6 +36,7 @@ def cadastrar_item(request):
     if str(request.method) == 'POST':
         if form.is_valid():
             form.save()
+            print(form)
             return redirect('gerencia:listar_itens')
     contexto = {
         'titulo_pagina': 'Cadastro de Itens',
@@ -67,3 +77,27 @@ def atualizar_item(request, pk):
     }
     return render(request, 'gerencia/atualiza_item.html', contexto)
 
+@login_required
+def configuracoes(request):
+    configuracoes = Configuracoes.objects.filter(pk=1)
+    form = ConfiguracoesForm(request.POST or None)
+    contexto = {
+        'titulo_pagina': 'Configurações Gerais do Sistema',
+        'form': form,
+       }
+    return render(request, 'gerencia/configuracoes.html', contexto)
+
+
+@login_required
+def salvar_configuracoes(request):
+    configuracoes = get_object_or_404(Configuracoes, pk=1)
+    form = ConfiguracoesForm(request.POST or None, instance=configuracoes)
+    print(form)
+    if str(request.method) == 'POST':
+        if form.is_valid():
+            form.save()
+            return redirect('gerencia:configuracoes')
+    contexto = {
+        'form': form,
+    }
+    return render(request, 'gerencia/configuracoes.html', contexto)

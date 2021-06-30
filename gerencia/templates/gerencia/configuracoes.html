@@ -1,0 +1,12 @@
+{% extends 'gerencia/base_dashboard.html' %}
+{% load bootstrap4 %}
+{% block conteudo %}
+
+          <h2>Configurações Gerais do Sistema</h2>
+          <form action="{% url 'gerencia:salvar_configuracoes' %}" method="POST">
+              {% csrf_token %}
+                {% bootstrap_form form%}
+              <button type="submit" class="btn bnt-sm btn-success">Salvar</button>
+          </form>
+
+{% endblock %}
