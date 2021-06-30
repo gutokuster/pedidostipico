@@ -7,7 +7,7 @@ class Item(models.Model):
         ('Sobremesas', 'Sobremesas'),
     )
     nome = models.CharField('Nome', max_length=100)
-    tempo_preparo = models.IntegerField('Tempo de Preparo (Min)')
+    tempo_preparo = models.TimeField('Tempo de Preparo (Min)', auto_now=False)
     ativo = models.BooleanField('Ativo?', default=True)
     diario = models.BooleanField('Cardápio Diário', default=False,)
     destino = models.CharField('Cozinha Destino', max_length=14, choices=DESTINO_CHOICES)
