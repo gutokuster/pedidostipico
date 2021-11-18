@@ -1,12 +1,10 @@
-import datetime
-
 from django.shortcuts import render, redirect, get_object_or_404
-from .models import Item, PedidoAtrasado, Pedido
+from .models import Item, PedidoAtrasado, Pedido, EnqueteClientes, EnqueteFuncionarios
 from gerencia.models import Configuracoes
 from django.db.models import Q
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.forms import AuthenticationForm
-
+from datetime import datetime
 
 def atualiza_situacao_pedido(pk, hora_atual):
     pedido = get_object_or_404(Pedido, pk=pk)
@@ -40,7 +38,6 @@ def index(request):
 
 def logar(request):
     if request.method == 'POST':
-        print(request.POST)
         username = request.POST['username']
         password = request.POST['password']
         usuario = authenticate(request, username=username, password=password)
@@ -154,13 +151,34 @@ def liberar_pedido(request, pk):
     else:
         return redirect('core:cozinha_fria')
 
-'''
-DONE: Incluir 'tempo restante' na cozinha
-DONE: Alterar cor da linha dos itens atrasado na cozinha
-DONE: JS para atualizar as telas (via gerencia/configuração)
-DONE: Cancelar pedido
-CANC: Cardápio com itens fixos + variaveis
 
-TODO: Permitir incluir novos pedidos com itens em aberto - Usar JS, perguntar se deseja baixar o pedido ou incluir um novo
+'''
+Funções Enquete Funcionários
+'''
+def enquete_funcionarios(request):
+    contexto = {
+        'titulo_pagina': 'Enquetes Funcionários',
+    }
+    return render(request, 'core/enquete_funcionarios.html', contexto)
+
+'''
+Funções Enquetes Clientes
+'''
+def enquete_clientes(request):
+    contexto = {
+        'nome': 'Enquete Clientes',
+    }
+    return render(request, 'core/enquete_clientes.html', contexto)
+
+
+def salvar_enquete_clientes(request):
+    nota_cozinha = request.POST['nota_cozinha']
+    nota_atendimento = request.POST['nota_atendimento']
+    recomendaria = request.POST['recomendaria']
+    resposta = EnqueteClientes(resp1=nota_cozinha, resp2=nota_atendimento, resp3=recomendaria )
+    resposta.save()
+    return redirect('core:enquete_clientes')
+
+'''
 TODO: Relatórios gerenciais
 '''

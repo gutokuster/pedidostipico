@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Pedido, Item, PedidoAtrasado
+from .models import Pedido, Item, PedidoAtrasado, EnqueteClientes, EnqueteFuncionarios
 
 @admin.register(Pedido)
 class PedidoAdmin(admin.ModelAdmin):
@@ -12,3 +12,11 @@ class ItemAdmin(admin.ModelAdmin):
 @admin.register(PedidoAtrasado)
 class PedidoAtrasadoAdmin(admin.ModelAdmin):
     list_display = ['pedido', 'data_atraso', 'tempo_atraso']
+
+@admin.register(EnqueteFuncionarios)
+class EnqueteFuncionariosAdmin(admin.ModelAdmin):
+   list_display = ['resp1', 'resp2', 'resp3']
+
+@admin.register(EnqueteClientes)
+class EnqueteClientesAdmin(admin.ModelAdmin):
+   list_display = ['id', 'date', 'resp1', 'resp2', 'resp3']

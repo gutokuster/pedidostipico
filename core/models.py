@@ -60,3 +60,23 @@ class PedidoAtrasado(models.Model):
 
     def __str__(self):
         return self.pedido.item
+
+class EnqueteClientes(models.Model):
+    date = models.DateTimeField('Data da Resposta', auto_now_add=True)
+    resp1 = models.IntegerField('Nota Cozinha')
+    resp2 = models.IntegerField('Nota Atendimento')
+    resp3 = models.BooleanField('Recomendaria?', default=True)
+
+    class Meta:
+        verbose_name = 'Enquete Cliente'
+        verbose_name_plural = 'Enquetes Clientes'
+
+class EnqueteFuncionarios(models.Model):
+    date = models.DateTimeField('Data da Resposta', auto_now_add=True)
+    resp1 = models.IntegerField('Resposta 1')
+    resp2 = models.IntegerField('Resposta 2')
+    resp3 = models.BooleanField('Resposta 3', default=True)
+
+    class Meta:
+        verbose_name = 'Enquete Funcionários'
+        verbose_name_plural = 'Enquetes Funcionários'

@@ -1,0 +1,77 @@
+{% extends 'core/base_enquete.html' %}
+{% block conteudo %}
+    <!-- Begin page content -->
+<main role="main" class="container" xmlns="http://www.w3.org/1999/html">
+      <center>
+        <h4 class="mt-5">Pesquisa de Satisfação</h4><br>
+
+        <div class="row">
+          <div class="col-md-12">
+            <div class="card mb-12 box-shadow">
+              <form action="{% url 'core:salvar_enquete_clientes' %}" method="POST">
+                {% csrf_token %}
+                <div class="card-body">
+                  <p class="card-text" style="font-size: 20px">Dê uma nota para a nossa <b>Comida</b>.</p>
+                  <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" name="nota_cozinha" id="nota_cozinha1" value="1">
+                    <label class="form-check-label" for="nota_cozinha1">1</label>
+                  </div>
+                  <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" name="nota_cozinha" id="nota_cozinha2" value="2">
+                    <label class="form-check-label" for="nota_cozinha2">2</label>
+                  </div>
+                    <div class="form-check form-check-inline">
+                      <input class="form-check-input" type="radio" name="nota_cozinha" id="nota_cozinha3" value="3">
+                      <label class="form-check-label" for="nota_cozinha3">3</label>
+                  </div>
+                  <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" name="nota_cozinha" id="nota_cozinha4" value="4">
+                    <label class="form-check-label" for="nota_cozinha4">4</label>
+                  </div>
+                    <div class="form-check form-check-inline">
+                      <input class="form-check-input" type="radio" name="nota_cozinha" id="nota_cozinha5" value="5" checked>
+                      <label class="form-check-label" for="nota_cozinha5">5</label>
+                  </div>
+                    <br>
+                    <br>
+                                  <p class="card-text" style="font-size: 20px">Dê uma nota para o nosso <b>Atendimento</b>.</p>
+                  <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" name="nota_atendimento" id="nota_atendimento1" value="1">
+                    <label class="form-check-label" for="nota_atendimento1">1</label>
+                  </div>
+                  <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" name="nota_atendimento" id="nota_atendimento2" value="2">
+                    <label class="form-check-label" for="nota_atendimento2">2</label>
+                  </div>
+                    <div class="form-check form-check-inline">
+                      <input class="form-check-input" type="radio" name="nota_atendimento" id="nota_atendimento3" value="3">
+                      <label class="form-check-label" for="nota_atendimento3">3</label>
+                  </div>
+                  <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" name="nota_atendimento" id="nota_atendimento4" value="4">
+                    <label class="form-check-label" for="nota_atendimento4">4</label>
+                  </div>
+                    <div class="form-check form-check-inline">
+                      <input class="form-check-input" type="radio" name="nota_atendimento" id="nota_atendimento5" value="5" checked>
+                      <label class="form-check-label" for="nota_atendimento5">5</label>
+                  </div>
+                    <br>
+                    <br>
+                  <p class="card-text" style="font-size: 20px">Você <b>indicaria</b> o Restaurante Típico General Küster a um amigo?</p>
+                  <div class="form-check form-check-inline">
+                      <input class="form-check-input" type="radio" name="recomendaria" id="recomenda_sim" value="1" checked>
+                      <label class="form-check-label" for="recomenda_sim">Sim</label>
+                  </div>
+                  <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" name="recomendaria" id="recomenda_nao" value="0">
+                    <label class="form-check-label" for="recomenda_nao">Não</label>
+                  </div>
+                </div>
+               <button type="submit" class="btn btn-success my-2">Enviar!</button>
+              </form>
+            </div>
+          </div>
+        </div>
+       </center>
+    </main>
+{% endblock %}

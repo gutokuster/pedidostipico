@@ -1,14 +1,19 @@
+from django.contrib.sessions.models import Session
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth import logout
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from core.forms import ItemForm
 from .forms import ConfiguracoesForm
-from core.models import Item, PedidoAtrasado, Pedido
+from core.models import Item, PedidoAtrasado, Pedido, EnqueteClientes, EnqueteFuncionarios
 from .models import Configuracoes
+from datetime import datetime, timedelta
+from django.utils import timezone
+from django.db.models import Sum
 
 @login_required
 def dashboard(request):
+    User = request.user
     itens = Item.objects.all()
     pedidos_atrasados = PedidoAtrasado.objects.all()
     pedidos = Pedido.objects.all()
@@ -22,7 +27,6 @@ def dashboard(request):
         'pedidos_atrasados': pedidos_atrasados,
         'total_pedidos_atrasados': pedidos_atrasados.count(),
     }
-    print(PedidoAtrasado.objects.all().count())
     return render(request, 'gerencia/dashboard.html', contexto)
 
 @login_required
@@ -36,7 +40,6 @@ def cadastrar_item(request):
     if str(request.method) == 'POST':
         if form.is_valid():
             form.save()
-            print(form)
             return redirect('gerencia:listar_itens')
     contexto = {
         'titulo_pagina': 'Cadastro de Itens',
@@ -92,7 +95,6 @@ def configuracoes(request):
 def salvar_configuracoes(request):
     configuracoes = get_object_or_404(Configuracoes, pk=1)
     form = ConfiguracoesForm(request.POST or None, instance=configuracoes)
-    print(form)
     if str(request.method) == 'POST':
         if form.is_valid():
             form.save()
@@ -101,3 +103,64 @@ def salvar_configuracoes(request):
         'form': form,
     }
     return render(request, 'gerencia/configuracoes.html', contexto)
+
+@login_required
+def resultado_enquete_clientes(request):
+    hoje = datetime.now(tz=timezone.utc)
+    semana = hoje - timedelta(days=6)
+    hoje_formatado = hoje.strftime('%d/%m/%Y')
+    semana_formatado = semana.strftime('%d/%m/%Y')
+    total_enquetes_hoje = EnqueteClientes.objects.filter(date__date=hoje).count()
+    total_enquetes_semana = EnqueteClientes.objects.filter(date__range=[semana, hoje]).count()
+    soma_nota_cozinha = EnqueteClientes.objects.filter(date__date=hoje).aggregate(Sum('resp1'))['resp1__sum']
+    soma_nota_atendimento = EnqueteClientes.objects.filter(date__date=hoje).aggregate(Sum('resp2'))['resp2__sum']
+    soma_recomendaria = EnqueteClientes.objects.filter(date__date=hoje).aggregate(Sum('resp3'))['resp3__sum']
+    soma_nota_cozinha_semana = EnqueteClientes.objects.filter(date__range=[semana, hoje]).aggregate(Sum('resp1'))['resp1__sum']
+    soma_nota_atendimento_semana = EnqueteClientes.objects.filter(date__range=[semana, hoje]).aggregate(Sum('resp2'))['resp2__sum']
+    soma_recomendaria_semana = EnqueteClientes.objects.filter(date__range=[semana, hoje]).aggregate(Sum('resp3'))['resp3__sum']
+    '''
+     Validação para evitar erros no relatório quando não há respostas
+    '''
+    if total_enquetes_hoje is None or soma_nota_cozinha is None:
+        media_cozinha = 0
+    else:
+        media_cozinha = round(soma_nota_cozinha / total_enquetes_hoje, 2)
+    if total_enquetes_hoje is None or soma_nota_atendimento is None:
+        media_atendimento = 0
+    else:
+        media_atendimento = round(soma_nota_atendimento / total_enquetes_hoje, 2)
+    if total_enquetes_hoje is None or soma_recomendaria is None:
+        perc_recomenda = 0
+        soma_recomendaria = 0
+    else:
+        perc_recomenda = round(soma_recomendaria * 100 / total_enquetes_hoje, 2)
+
+    media_cozinha_semana = round(soma_nota_cozinha_semana / total_enquetes_semana, 2)
+    media_atendimento_semana = round(soma_nota_atendimento_semana / total_enquetes_semana, 2)
+    perc_recomenda_semana = round(soma_recomendaria_semana * 100 / total_enquetes_semana, 2)
+
+    contexto = {
+        'titulo_pagina': 'Resultado de enquetes dos clientes',
+        'semana_formatado': semana_formatado,
+        'hoje_formatado': hoje_formatado,
+        'media_cozinha': media_cozinha,
+        'media_atendimento': media_atendimento,
+        'total_enquetes': total_enquetes_hoje,
+        'soma_recomendaria': soma_recomendaria,
+        'perc_recomenda': perc_recomenda,
+        'media_cozinha_semana': media_cozinha_semana,
+        'media_atendimento_semana': media_atendimento_semana,
+        'total_enquetes_semana': total_enquetes_semana,
+        'soma_recomendaria_semana': soma_recomendaria_semana,
+        'perc_recomenda_semana': perc_recomenda_semana,
+    }
+    return render(request, 'gerencia/resultado_clientes.html', contexto)
+
+@login_required
+def resultado_enquete_funcionarios(request):
+    contexto = {
+        'titulo_pagina': 'Resultados de enquetes dos funcionários',
+    }
+    return render(request, 'gerencia/resultado_funcionarios.html', contexto)
+
+

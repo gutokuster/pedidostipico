@@ -16,5 +16,8 @@ urlpatterns = [
     path('cozinha_quente/', views.cozinha_quente, name='cozinha_quente'),
     path('cozinha_fria/', views.cozinha_fria, name='cozinha_fria'),
     path('buffet/liberar_pedido/<int:pk>', views.liberar_pedido, name='liberar_pedido'),
-
-]
+    # Enquetes
+    path('enquete_clientes/', views.enquete_clientes, name='enquete_clientes'),
+    path('enquete_clientes/salvar', views.salvar_enquete_clientes, name='salvar_enquete_clientes'),
+    path('enquete_funcionarios/', views.enquete_funcionarios, name='enquete_funcionarios'),
+    ]
