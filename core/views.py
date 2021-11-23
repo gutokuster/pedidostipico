@@ -4,7 +4,7 @@ from gerencia.models import Configuracoes
 from django.db.models import Q
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.forms import AuthenticationForm
-from datetime import datetime
+from datetime import datetime, timedelta, time
 
 def atualiza_situacao_pedido(pk, hora_atual):
     pedido = get_object_or_404(Pedido, pk=pk)
@@ -18,13 +18,13 @@ def atualiza_situacao_pedido(pk, hora_atual):
 
 def atualiza_tempo_restante(pk, hora_atual):
     pedido = get_object_or_404(Pedido, pk=pk)
-    if datetime.datetime.now().time() > pedido.limite_entrega:
-        pedido.tempo_restante = datetime.time(0, 0, 0)
+    if datetime.now().time() > pedido.limite_entrega:
+        pedido.tempo_restante = time(0, 0, 0)
         pedido.situacao = 'Atrasado'
     else:
         hora = pedido.limite_entrega.hour - hora_atual.hour
         minuto = pedido.limite_entrega.minute - hora_atual.minute
-        pedido.tempo_restante = datetime.time(hora, minuto, 0)
+        pedido.tempo_restante = time(hora, minuto, 0)
 
     pedido.save()
 
@@ -56,7 +56,7 @@ Funções Buffet
 '''
 def buffet(request):
     pedidos = Pedido.objects.filter(Q(situacao='Em Preparo') | Q(situacao='Atrasado') | Q(situacao='Entregue'))
-    hora_atual = datetime.datetime.now().time()
+    hora_atual = datetime.now().time()
     lista_pedidos = []
     for pedido in pedidos:
         lista_pedidos.append(pedido.item_id)
@@ -76,7 +76,7 @@ def criar_pedido(request):
     item = get_object_or_404(Item, pk=pk)
     pedido = Pedido(item=item, quantidade=quantidade)
     minutos = str(item.tempo_preparo)
-    pedido.limite_entrega = datetime.datetime.now() + datetime.timedelta(minutes=int(minutos))
+    pedido.limite_entrega = datetime.now() + timedelta(minutes=int(minutos))
     pedido.hora_entrega = pedido.limite_entrega
     pedido.save()
     return redirect('core:buffet')
@@ -103,7 +103,7 @@ Funções Cozinha
 '''
 def cozinha_quente(request):
     pedidos = Pedido.objects.filter(Q(situacao='Em Preparo') | Q(situacao='Atrasado'))
-    hora_atual = datetime.datetime.now().time()
+    hora_atual = datetime.now().time()
     itens = Item.objects.filter(destino='Cozinha Quente')
     if pedidos.count() > 0:
         for pedido in pedidos:
@@ -120,7 +120,7 @@ def cozinha_quente(request):
 def cozinha_fria(request):
     pedidos = Pedido.objects.filter(Q(situacao='Em Preparo') | Q(situacao='Atrasado'))
     itens = Item.objects.filter(Q(destino='Cozinha Fria') | Q(destino='Sobremesas'))
-    hora_atual = datetime.datetime.now().time()
+    hora_atual = datetime.now().time()
     #tempo_restante = hora_atual - pedido.limite_entrega
     if pedidos.count() > 0:
         for pedido in pedidos:
@@ -141,7 +141,7 @@ def liberar_pedido(request, pk):
     if pedido.situacao == 'Atrasado':
         hora = int(pedido.limite_entrega.strftime('%H:%M')[0:2])
         minuto = int(pedido.limite_entrega.strftime('%H:%M')[3:5])
-        tempo_atraso = (datetime.datetime.today() - datetime.timedelta(hours=hora, minutes=minuto)).strftime('%H:%M:%S')
+        tempo_atraso = (datetime.today() - timedelta(hours=hora, minutes=minuto)).strftime('%H:%M:%S')
         pedido_atrasado = PedidoAtrasado(pedido=pedido, tempo_atraso=tempo_atraso)
         pedido_atrasado.save()
     pedido.situacao = 'Entregue'
