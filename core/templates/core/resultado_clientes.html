@@ -1,0 +1,103 @@
+{% extends 'base.html' %}
+{% block conteudo %}
+<center>
+  <main role="main" class="container">
+    <h4 class="mt-5">Resultados das Enquetes (Clientes)</h4>
+    <p>{{ hoje_formatado }}</p>
+    <br>
+      <div class="row">
+        <div class="col-md-3">
+          <div class="card mb-3 box-shadow">
+            <div class="card-header">
+              <h4 class="my-0 font-weight-normal">Total de respostas</h4>
+            </div>
+            <div class="card-body">
+              <p class="card-text">{{ total_enquetes }}</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="card mb-3 box-shadow">
+              <div class="card-header">
+                <h4 class="my-0 font-weight-normal">Média Cozinha</h4>
+              </div>
+              <div class="card-body">
+                <p class="card-text">{{ media_cozinha }}</p>
+              </div>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="card mb-3 box-shadow">
+            <div class="card-header">
+              <h4 class="my-0 font-weight-normal">Média Atendimento</h4>
+            </div>
+            <div class="card-body">
+              <p class="card-text">{{ media_atendimento }}</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="card mb-3 box-shadow">
+            <div class="card-header">
+              <h4 class="my-0 font-weight-normal">Recomendações</h4>
+            </div>
+            <div class="card-body">
+              <p class="card-text">{{ soma_recomendaria }} <small>( {{ perc_recomenda }}%)</small></p>
+            </div>
+          </div>
+        </div>
+      </div>
+    <h4 class="mt-5">Últimos 7 dias</h4>
+    <p>{{ semana_formatado }} - {{ hoje_formatado }}</p>
+    <br>
+      <div class="row">
+        <div class="col-md-3">
+          <div class="card mb-3 box-shadow">
+            <div class="card-header">
+              <h4 class="my-0 font-weight-normal">Total de respostas</h4>
+            </div>
+            <div class="card-body">
+              <p class="card-text">{{ total_enquetes_semana }}</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="card mb-3 box-shadow">
+              <div class="card-header">
+                <h4 class="my-0 font-weight-normal">Média Cozinha</h4>
+              </div>
+              <div class="card-body">
+                <p class="card-text">{{ media_cozinha_semana }}</p>
+              </div>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="card mb-3 box-shadow">
+            <div class="card-header">
+              <h4 class="my-0 font-weight-normal">Média Atendimento</h4>
+            </div>
+            <div class="card-body">
+              <p class="card-text">{{ media_atendimento_semana }}</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="card mb-3 box-shadow">
+            <div class="card-header">
+              <h4 class="my-0 font-weight-normal">Recomendações</h4>
+            </div>
+            <div class="card-body">
+              <p class="card-text">{{ soma_recomendaria_semana }} <small>( {{ perc_recomenda_semana }}%)</small></p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <a href="{% url 'index' %}" class="btn btn-primary my-2">Voltar ao início</a>
+      <a href="{% url 'enquete_clientes' %}" class="btn btn-primary my-2">Voltar a enquete</a>
+    <br>
+  </main>
+</center>
+
+
+
+{% endblock %}

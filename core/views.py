@@ -179,6 +179,61 @@ def salvar_enquete_clientes(request):
     resposta.save()
     return redirect('core:enquete_clientes')
 
+def resultado_enquete_clientes(request):
+    hoje = datetime.now(tz=timezone.utc)
+    semana = hoje - timedelta(days=6)
+    hoje_formatado = hoje.strftime('%d/%m/%Y')
+    semana_formatado = semana.strftime('%d/%m/%Y')
+    total_enquetes_hoje = EnqueteClientes.objects.filter(date__date=hoje).count()
+    total_enquetes_semana = EnqueteClientes.objects.filter(date__range=[semana, hoje]).count()
+    soma_nota_cozinha = EnqueteClientes.objects.filter(date__date=hoje).aggregate(Sum('resp1'))['resp1__sum']
+    soma_nota_atendimento = EnqueteClientes.objects.filter(date__date=hoje).aggregate(Sum('resp2'))['resp2__sum']
+    soma_recomendaria = EnqueteClientes.objects.filter(date__date=hoje).aggregate(Sum('resp3'))['resp3__sum']
+    soma_nota_cozinha_semana = EnqueteClientes.objects.filter(date__range=[semana, hoje]).aggregate(Sum('resp1'))['resp1__sum']
+    soma_nota_atendimento_semana = EnqueteClientes.objects.filter(date__range=[semana, hoje]).aggregate(Sum('resp2'))['resp2__sum']
+    soma_recomendaria_semana = EnqueteClientes.objects.filter(date__range=[semana, hoje]).aggregate(Sum('resp3'))['resp3__sum']
+    '''
+     Validação para evitar erros no relatório quando não há respostas
+    '''
+    if total_enquetes_hoje is None or soma_nota_cozinha is None:
+        media_cozinha = 0
+    else:
+        media_cozinha = round(soma_nota_cozinha / total_enquetes_hoje, 2)
+    if total_enquetes_hoje is None or soma_nota_atendimento is None:
+        media_atendimento = 0
+    else:
+        media_atendimento = round(soma_nota_atendimento / total_enquetes_hoje, 2)
+    if total_enquetes_hoje is None or soma_recomendaria is None:
+        perc_recomenda = 0
+        soma_recomendaria = 0
+    else:
+        perc_recomenda = round(soma_recomendaria * 100 / total_enquetes_hoje, 2)
+
+    media_cozinha_semana = round(soma_nota_cozinha_semana / total_enquetes_semana, 2)
+    media_atendimento_semana = round(soma_nota_atendimento_semana / total_enquetes_semana, 2)
+    perc_recomenda_semana = round(soma_recomendaria_semana * 100 / total_enquetes_semana, 2)
+
+    contexto = {
+        'titulo_pagina': 'Resultado de enquetes dos clientes',
+        'semana_formatado': semana_formatado,
+        'hoje_formatado': hoje_formatado,
+        'media_cozinha': media_cozinha,
+        'media_atendimento': media_atendimento,
+        'total_enquetes': total_enquetes_hoje,
+        'soma_recomendaria': soma_recomendaria,
+        'perc_recomenda': perc_recomenda,
+        'media_cozinha_semana': media_cozinha_semana,
+        'media_atendimento_semana': media_atendimento_semana,
+        'total_enquetes_semana': total_enquetes_semana,
+        'soma_recomendaria_semana': soma_recomendaria_semana,
+        'perc_recomenda_semana': perc_recomenda_semana,
+    }
+    return render(request, 'gerencia:resultado_clientes.html', contexto)
 '''
-TODO: Relatórios gerenciais
+    total_enquetes = EnqueteClientes.objects.all().count()
+
+'''
+
+'''
+TODO: Verificar situações sem resposta
 '''
