@@ -11,7 +11,7 @@ from datetime import datetime, timedelta
 from django.utils import timezone
 from django.db.models import Sum
 
-@login_required
+@login_required(login_url='/logar/')
 def dashboard(request):
     User = request.user
     itens = Item.objects.all()
@@ -29,12 +29,12 @@ def dashboard(request):
     }
     return render(request, 'gerencia/dashboard.html', contexto)
 
-@login_required
+@login_required(login_url='/logar/')
 def sair(request):
     logout(request)
     return render(request, 'core/index.html')
 
-@login_required
+@login_required(login_url='/logar/')
 def cadastrar_item(request):
     form = ItemForm(request.POST or None)
     if str(request.method) == 'POST':
@@ -48,7 +48,7 @@ def cadastrar_item(request):
     }
     return render(request, 'gerencia/cadastro_item.html', contexto)
 
-@login_required
+@login_required(login_url='/logar/')
 def listar_itens(request):
     itens = Item.objects.all()
     contexto = {
@@ -58,7 +58,7 @@ def listar_itens(request):
     }
     return render(request, 'gerencia/itens.html', contexto)
 
-@login_required
+@login_required(login_url='/logar/')
 def excluir_item(request, pk):
     item = get_object_or_404(Item, pk=pk)
     if str(request.method) == 'POST':
@@ -66,7 +66,7 @@ def excluir_item(request, pk):
         return redirect('gerencia:listar_itens')
     return render(request, 'gerencia/itens.html')
 
-@login_required
+@login_required(login_url='/logar/')
 def atualizar_item(request, pk):
     item = get_object_or_404(Item, pk=pk)
     form = ItemForm(request.POST or None, instance=item)
@@ -80,7 +80,7 @@ def atualizar_item(request, pk):
     }
     return render(request, 'gerencia/atualiza_item.html', contexto)
 
-@login_required
+@login_required(login_url='/logar/')
 def configuracoes(request):
     configuracoes = Configuracoes.objects.filter(pk=1)
     form = ConfiguracoesForm(request.POST or None)
@@ -91,7 +91,7 @@ def configuracoes(request):
     return render(request, 'gerencia/configuracoes.html', contexto)
 
 
-@login_required
+@login_required(login_url='/logar/')
 def salvar_configuracoes(request):
     configuracoes = get_object_or_404(Configuracoes, pk=1)
     form = ConfiguracoesForm(request.POST or None, instance=configuracoes)
@@ -104,7 +104,7 @@ def salvar_configuracoes(request):
     }
     return render(request, 'gerencia/configuracoes.html', contexto)
 
-@login_required
+@login_required(login_url='/logar/')
 def resultado_enquete_clientes(request):
     hoje = datetime.now(tz=timezone.utc)
     semana = hoje - timedelta(days=6)
@@ -156,7 +156,7 @@ def resultado_enquete_clientes(request):
     }
     return render(request, 'gerencia/resultado_clientes.html', contexto)
 
-@login_required
+@login_required(login_url='/logar/')
 def resultado_enquete_funcionarios(request):
     contexto = {
         'titulo_pagina': 'Resultados de enquetes dos funcionários',
