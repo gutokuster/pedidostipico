@@ -5,6 +5,7 @@ from django.db.models import Q
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.forms import AuthenticationForm
 from datetime import datetime, timedelta, time
+from django.contrib import messages
 
 def atualiza_situacao_pedido(pk, hora_atual):
     pedido = get_object_or_404(Pedido, pk=pk)
@@ -90,8 +91,9 @@ def baixar_pedido(request, pk):
     return redirect('core:buffet')
 
 
-def cancelar_pedido(request, pk):
+def cancelar_pedido(request):
     pk = request.GET['pk']
+    print('cancelando', pk)
     pedido = get_object_or_404(Pedido, pk=pk)
     pedido.situacao = 'Cancelado'
     pedido.save()
@@ -177,6 +179,7 @@ def salvar_enquete_clientes(request):
     recomendaria = request.POST['recomendaria']
     resposta = EnqueteClientes(resp1=nota_cozinha, resp2=nota_atendimento, resp3=recomendaria )
     resposta.save()
+    messages.success(request, 'Muito obrigado pela participação!')
     return redirect('core:enquete_clientes')
 
 def resultado_enquete_clientes(request):
